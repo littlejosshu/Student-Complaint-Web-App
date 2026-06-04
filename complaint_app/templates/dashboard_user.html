@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Dashboard | ReportSafe{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    
+    <!-- Dashboard Header -->
+    <div class="row align-items-center mb-5 g-4">
+        <div class="col-md-8">
+            <h1 class="text-white font-outfit">Student Dashboard</h1>
+            <p class="text-muted-light mb-0">Welcome back, {{ user.full_name }}. View your reports, edit details, or lodge new complaints below.</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{{ url_for('submit_complaint') }}" class="btn btn-primary-gradient"><i class="fa-solid fa-file-signature me-2"></i>File New Complaint</a>
+        </div>
+    </div>
+    
+    <!-- Tab Controls -->
+    <div class="card card-glass mb-4 p-2">
+        <ul class="nav nav-pills nav-fill" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link text-white active py-3" id="complaints-tab" data-bs-toggle="tab" data-bs-target="#complaints" type="button" role="tab" aria-controls="complaints" aria-selected="true">
+                    <i class="fa-solid fa-clipboard-list me-2"></i>My Registered Complaints
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link text-white py-3" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">
+                    <i class="fa-solid fa-user-gear me-2"></i>Edit Profile Info
+                </button>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Tab Content -->
+    <div class="tab-content" id="dashboardTabsContent">
+        
+        <!-- Tab 1: Complaints List -->
+        <div class="tab-pane fade show active" id="complaints" role="tabpanel" aria-labelledby="complaints-tab">
+            <div class="card card-glass p-5">
+                <h3 class="font-outfit text-white mb-4">My Submissions</h3>
+                
+                {% if complaints %}
+                    <div class="table-responsive">
+                        <table class="table table-custom align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Title</th>
+                                    <th>Category</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for comp in complaints %}
+                                    <tr>
+                                        <td class="font-outfit text-accent-color">{{ comp.complaint_id }}</td>
+                                        <td class="text-white font-weight-600">{{ comp.title[:45] }}{% if comp.title|length > 45 %}...{% endif %}</td>
+                                        <td>{{ comp.category }}</td>
+                                        <td>{{ comp.created_at.strftime('%d %b %Y') }}</td>
+                                        <td>
+                                            {% if comp.status == 'Submitted' %}
+                                                <span class="badge-status badge-submitted">Submitted</span>
+                                            {% elif comp.status == 'Under Review' %}
+                                                <span class="badge-status badge-review">Under Review</span>
+                                            {% elif comp.status == 'In Progress' %}
+                                                <span class="badge-status badge-progress">In Progress</span>
+                                            {% elif comp.status == 'Resolved' %}
+                                                <span class="badge-status badge-resolved">Resolved</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{{ url_for('track', complaint_id=comp.complaint_id) }}" class="btn btn-secondary-custom btn-sm">
+                                                <i class="fa-solid fa-eye me-1"></i> Track
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fa-solid fa-folder-open text-muted-light fs-1 mb-3"></i>
+                        <h5 class="text-white font-outfit">No registered complaints</h5>
+                        <p class="text-muted-light small mb-4">You haven't submitted any complaints under this student profile yet.</p>
+                        <a href="{{ url_for('submit_complaint') }}" class="btn btn-primary-gradient px-4">File a Complaint Now</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Tab 2: Profile Settings -->
+        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+            <div class="card card-glass p-5">
+                <h3 class="font-outfit text-white mb-4">Profile Information</h3>
+                
+                <form action="{{ url_for('edit_profile') }}" method="POST" class="needs-validation-custom" novalidate>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label for="full_name" class="form-label text-white small">Full Name</label>
+                            <input type="text" class="form-control form-control-custom" id="full_name" name="full_name" value="{{ user.full_name }}" required>
+                            <div class="invalid-feedback">Please enter your name.</div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="mobile" class="form-label text-white small">Mobile Number</label>
+                            <input type="tel" class="form-control form-control-custom" id="mobile" name="mobile" value="{{ user.mobile }}" pattern="[0-9]{10}" required>
+                            <div class="invalid-feedback">Please enter a valid 10-digit mobile number.</div>
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <label for="school_college" class="form-label text-white small">School / College Name</label>
+                            <input type="text" class="form-control form-control-custom" id="school_college" name="school_college" value="{{ user.school_college }}" required>
+                            <div class="invalid-feedback">Please enter school/college.</div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label text-muted-light small">Email Address (Read-only)</label>
+                            <input type="email" class="form-control form-control-custom text-muted-light bg-transparent" value="{{ user.email }}" readonly>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label class="form-label text-muted-light small">Role/Privileges</label>
+                            <input type="text" class="form-control form-control-custom text-muted-light bg-transparent" value="Student Profile" readonly>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary-gradient mt-4 px-4"><i class="fa-solid fa-floppy-disk me-2"></i>Save Changes</button>
+                    
+                </form>
+            </div>
+        </div>
+        
+    </div>
+    
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Login to ReportSafe{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            
+            <div class="card card-glass p-5">
+                <div class="text-center mb-4">
+                    <h2 class="font-outfit text-white">Welcome Back</h2>
+                    <p class="text-muted-light small">Log in to view your dashboard, check status, or manage complaints.</p>
+                </div>
+                
+                <form action="{{ url_for('login') }}" method="POST" class="needs-validation-custom" novalidate>
+                    
+                    <div class="mb-4">
+                        <label for="identifier" class="form-label text-white small">Email or Mobile Number</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white-5 border-glass text-muted-light"><i class="fa-regular fa-user"></i></span>
+                            <input type="text" class="form-control form-control-custom" id="identifier" name="identifier" placeholder="student@example.com or mobile" required>
+                        </div>
+                        <div class="invalid-feedback">Please enter your email or mobile number.</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-1">
+                            <label for="password" class="form-label text-white small mb-0">Password</label>
+                            <a href="{{ url_for('forgot_password') }}" class="text-accent-color small text-decoration-none">Forgot Password?</a>
+                        </div>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white-5 border-glass text-muted-light"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" class="form-control form-control-custom" id="password" name="password" placeholder="••••••••" required>
+                        </div>
+                        <div class="invalid-feedback">Please enter your password.</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary-gradient w-100 py-3 mb-3"><i class="fa-solid fa-right-to-bracket me-2"></i>Secure Login</button>
+                    
+                    <p class="text-center text-muted-light small mb-0">Don't have a profile? <a href="{{ url_for('register') }}" class="text-accent-color text-decoration-none font-weight-600">Register here</a></p>
+                </form>
+            </div>
+            
+            <!-- Quick Demo Credential Guide -->
+            <div class="card card-glass p-3 mt-4 text-center border-info border-1">
+                <p class="small mb-1 text-info"><i class="fa-solid fa-circle-info me-1"></i><strong>Admin Demo Account</strong></p>
+                <code class="text-white-50">Username: admin@report.org / Password: Admin@123</code>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

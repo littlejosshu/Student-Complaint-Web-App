@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact ReportSafe Support{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row g-5">
+        
+        <!-- Contact Form -->
+        <div class="col-lg-7">
+            <div class="card card-glass p-5">
+                <h2 class="font-outfit text-white mb-4">Send Us a Message</h2>
+                <p class="text-muted-light mb-4">Have questions about the project or need technical assistance? Fill out the form and our support team will reach out to you.</p>
+                
+                <form action="{{ url_for('contact') }}" method="POST" class="needs-validation-custom" novalidate>
+                    <div class="mb-4">
+                        <label for="name" class="form-label text-white">Full Name</label>
+                        <input type="text" class="form-control form-control-custom" id="name" name="name" placeholder="John Doe" required>
+                        <div class="invalid-feedback">Please enter your name.</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="email" class="form-label text-white">Email Address</label>
+                        <input type="email" class="form-control form-control-custom" id="email" name="email" placeholder="john@example.com" required>
+                        <div class="invalid-feedback">Please enter a valid email address.</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="subject" class="form-label text-white">Subject</label>
+                        <input type="text" class="form-control form-control-custom" id="subject" name="subject" placeholder="General Inquiry / Feedback" required>
+                        <div class="invalid-feedback">Please enter a subject.</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="message" class="form-label text-white">Your Message</label>
+                        <textarea class="form-control form-control-custom" id="message" name="message" rows="5" placeholder="Type your message here..." required></textarea>
+                        <div class="invalid-feedback">Please enter your message.</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary-gradient w-100 py-3"><i class="fa-solid fa-paper-plane me-2"></i>Send Message</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Contact Details Sidebar -->
+        <div class="col-lg-5">
+            <div class="card card-glass p-5 h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <h2 class="font-outfit text-white mb-4">Get in Touch</h2>
+                    <p class="text-muted-light mb-5">We are dedicated to maintaining a safe space. Technical administrators monitor emails for support assistance, but please do NOT submit complaints via this form. Use the official reporting form to secure tracking and anonymity.</p>
+                    
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="me-3">
+                            <span class="d-inline-flex align-items-center justify-content-center bg-primary-color rounded-circle text-white" style="width: 50px; height: 50px;">
+                                <i class="fa-solid fa-envelope fs-5"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <h6 class="text-white font-outfit mb-0">Email Us</h6>
+                            <a href="mailto:support@reportsafe.org" class="text-accent-color small text-decoration-none">support@reportsafe.org</a>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="me-3">
+                            <span class="d-inline-flex align-items-center justify-content-center bg-secondary-color rounded-circle text-white" style="width: 50px; height: 50px;">
+                                <i class="fa-solid fa-phone fs-5"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <h6 class="text-white font-outfit mb-0">Call Us</h6>
+                            <span class="text-muted-light small">+1 (555) 123-4567</span>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <span class="d-inline-flex align-items-center justify-content-center bg-accent-color rounded-circle text-black" style="width: 50px; height: 50px;">
+                                <i class="fa-solid fa-location-dot fs-5"></i>
+                            </span>
+                        </div>
+                        <div>
+                            <h6 class="text-white font-outfit mb-0">Location</h6>
+                            <span class="text-muted-light small">Student Wellness HQ, Silicon Valley, CA</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bottom Decorative Banner -->
+                <div class="mt-5 p-4 rounded bg-white-5 border border-glass text-center">
+                    <i class="fa-solid fa-circle-info text-accent-color fs-2 mb-3"></i>
+                    <h6 class="text-white font-outfit">Report Instantly</h6>
+                    <p class="text-muted-light small mb-0">No login required to submit. Stay safe and voice your concern.</p>
+                    <a href="{{ url_for('submit_complaint') }}" class="btn btn-sm btn-primary-gradient mt-3">Start Complaint</a>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

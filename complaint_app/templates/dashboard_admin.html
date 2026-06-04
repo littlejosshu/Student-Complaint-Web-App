@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard | ReportSafe{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    
+    <!-- Admin Header -->
+    <div class="mb-5">
+        <h1 class="text-white font-outfit">Administrator Queue</h1>
+        <p class="text-muted-light mb-0">System dashboard. View active student files, category statistics, and updates.</p>
+    </div>
+    
+    <!-- Metrics Widgets Panel -->
+    <section class="row g-4 mb-5">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-widget card-glass">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-title">New Submitted</div>
+                        <div class="stat-value text-accent-color">{{ stats.submitted }}</div>
+                    </div>
+                    <i class="fa-solid fa-bell fs-2 text-accent-color"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-widget card-glass">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-title">Under Review</div>
+                        <div class="stat-value text-warning">{{ stats.under_review }}</div>
+                    </div>
+                    <i class="fa-solid fa-magnifying-glass fs-2 text-warning"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-widget card-glass">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-title">In Progress</div>
+                        <div class="stat-value text-primary-color">{{ stats.in_progress }}</div>
+                    </div>
+                    <i class="fa-solid fa-spinner fa-spin fs-2 text-primary-color"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-widget card-glass">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-title">Total Resolved</div>
+                        <div class="stat-value text-success">{{ stats.resolved }}</div>
+                    </div>
+                    <i class="fa-solid fa-check-double fs-2 text-success"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Chart Statistics -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6">
+            <div class="card card-glass p-4" style="height: 350px;">
+                <h5 class="text-white font-outfit mb-3 text-center">Category Distribution</h5>
+                <div class="position-relative flex-grow-1" style="height: 240px;">
+                    <canvas id="adminCategoriesChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card card-glass p-4" style="height: 350px;">
+                <h5 class="text-white font-outfit mb-3 text-center">Status Breakdown</h5>
+                <div class="position-relative flex-grow-1" style="height: 240px;">
+                    <canvas id="adminStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Queue Management Panel -->
+    <div class="card card-glass p-5">
+        
+        <!-- Filter Controls -->
+        <div class="d-flex flex-sm-row flex-column justify-content-between align-items-sm-center mb-4 gap-3">
+            <h3 class="font-outfit text-white mb-0">Complaint Queue</h3>
+            
+            <div class="d-flex gap-3">
+                <select id="filter-status" class="form-select form-control-custom form-select-custom w-auto">
+                    <option value="">All Statuses</option>
+                    <option value="Submitted">Submitted</option>
+                    <option value="Under Review">Under Review</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
+                </select>
+                
+                <select id="filter-category" class="form-select form-control-custom form-select-custom w-auto">
+                    <option value="">All Categories</option>
+                    <option value="Harassment">Harassment</option>
+                    <option value="Bullying/Cyberbullying">Bullying/Cyberbullying</option>
+                    <option value="Safety Issues">Safety Issues</option>
+                    <option value="College/School Related">School/College Related</option>
+                    <option value="Civic Issues">Civic Issues</option>
+                </select>
+            </div>
+        </div>
+        
+        {% if complaints %}
+            <div class="table-responsive">
+                <table id="complaints-table" class="table table-custom align-middle">
+                    <thead>
+                        <tr>
+                            <th>Tracking ID</th>
+                            <th>Category</th>
+                            <th>Title</th>
+                            <th>Submitting Profile</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th class="text-end">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for comp in complaints %}
+                            <tr data-status="{{ comp.status }}" data-category="{{ comp.category }}">
+                                <td class="font-outfit text-accent-color">{{ comp.complaint_id }}</td>
+                                <td>{{ comp.category }}</td>
+                                <td class="text-white font-weight-600">
+                                    <span title="{{ comp.title }}">{{ comp.title[:35] }}{% if comp.title|length > 35 %}...{% endif %}</span>
+                                </td>
+                                <td>
+                                    {% if comp.is_anonymous %}
+                                        <span class="text-accent-color small"><i class="fa-solid fa-user-secret me-1"></i> Anonymous</span>
+                                    {% else %}
+                                        <span class="text-white small" title="{{ comp.student.email if comp.student else '' }}">
+                                            <i class="fa-solid fa-user me-1 text-white-50"></i> {{ comp.student.full_name if comp.student else 'User' }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ comp.created_at.strftime('%d %b %Y') }}</td>
+                                <td>
+                                    {% if comp.status == 'Submitted' %}
+                                        <span class="badge-status badge-submitted">Submitted</span>
+                                    {% elif comp.status == 'Under Review' %}
+                                        <span class="badge-status badge-review">Under Review</span>
+                                    {% elif comp.status == 'In Progress' %}
+                                        <span class="badge-status badge-progress">In Progress</span>
+                                    {% elif comp.status == 'Resolved' %}
+                                        <span class="badge-status badge-resolved">Resolved</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end">
+                                    <button class="btn btn-primary-gradient btn-sm" data-bs-toggle="modal" data-bs-target="#updateModal-{{ comp.id }}">
+                                        <i class="fa-solid fa-pen-to-square me-1"></i> Update
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <!-- Update Modal for this row -->
+                            <div class="modal fade" id="updateModal-{{ comp.id }}" tabindex="-1" aria-labelledby="updateModalLabel-{{ comp.id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content modal-content-glass">
+                                        <div class="modal-header modal-header-glass">
+                                            <h5 class="modal-title font-outfit text-white" id="updateModalLabel-{{ comp.id }}">Update {{ comp.complaint_id }}</h5>
+                                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <form action="{{ url_for('admin_update_complaint', id=comp.id) }}" method="POST">
+                                            <div class="modal-body">
+                                                <div class="p-3 mb-3 bg-white-5 rounded border border-glass small">
+                                                    <p class="text-white font-weight-600 mb-1">Title: {{ comp.title }}</p>
+                                                    <p class="text-white-50 mb-0">Description: {{ comp.description[:150] }}{% if comp.description|length > 150 %}...{% endif %}</p>
+                                                    {% if comp.supporting_doc %}
+                                                        <a href="{{ url_for('static', filename='uploads/' + comp.supporting_doc) }}" target="_blank" class="btn btn-sm btn-link text-accent-color p-0 mt-2">
+                                                            <i class="fa-solid fa-file-arrow-down me-1"></i>View Uploaded Evidence
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="status" class="form-label text-white small">Complaint Status</label>
+                                                    <select class="form-select form-control-custom form-select-custom" name="status" required>
+                                                        <option value="Submitted" {% if comp.status == 'Submitted' %}selected{% endif %}>Submitted</option>
+                                                        <option value="Under Review" {% if comp.status == 'Under Review' %}selected{% endif %}>Under Review</option>
+                                                        <option value="In Progress" {% if comp.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                                                        <option value="Resolved" {% if comp.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                                                    </select>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="admin_notes" class="form-label text-white small">Feedback / Action Taken Notes</label>
+                                                    <textarea class="form-control form-control-custom" name="admin_notes" rows="4" placeholder="Enter notes or updates here for the student..." required>{{ comp.admin_notes or '' }}</textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer modal-footer-glass">
+                                                <button type="button" class="btn btn-secondary-custom" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-primary-gradient">Save Changes</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fa-solid fa-list-check text-muted-light fs-1 mb-3"></i>
+                <h5 class="text-white font-outfit">Queue is empty</h5>
+                <p class="text-muted-light small mb-0">No complaints have been submitted yet.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- ChartJS Script CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Serialized Python data passed to JS Chart loader
+        const categoriesData = {{ categories_data|tojson }};
+        const statusData = {{ status_data|tojson }};
+        initializeAdminCharts(categoriesData, statusData);
+
+        // Simple row filtering
+        const filterStatus = document.getElementById('filter-status');
+        const filterCategory = document.getElementById('filter-category');
+        const rows = document.querySelectorAll('#complaints-table tbody tr');
+
+        function filterTable() {
+            const statusVal = filterStatus.value;
+            const categoryVal = filterCategory.value;
+
+            rows.forEach(row => {
+                const rStatus = row.getAttribute('data-status');
+                const rCategory = row.getAttribute('data-category');
+
+                const statusMatch = !statusVal || rStatus === statusVal;
+                const categoryMatch = !categoryVal || rCategory === categoryVal;
+
+                if (statusMatch && categoryMatch) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        if (filterStatus && filterCategory) {
+            filterStatus.addEventListener('change', filterTable);
+            filterCategory.addEventListener('change', filterTable);
+        }
+    });
+</script>
+{% endblock %}

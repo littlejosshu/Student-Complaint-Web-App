@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Track Complaint Status | ReportSafe{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            
+            <!-- Search ID Box -->
+            <div class="card card-glass p-5 mb-5 text-center">
+                <h2 class="font-outfit text-white mb-3">Track Your Complaint</h2>
+                <p class="text-muted-light mb-4">Enter your unique 10-character Complaint ID (e.g., CMP-XXXXXX) below to view real-time status updates.</p>
+                
+                <form action="{{ url_for('track') }}" method="POST" class="d-flex flex-sm-row flex-column gap-3 justify-content-center">
+                    <div class="flex-grow-1" style="max-width: 450px;">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white-5 border-glass text-muted-light"><i class="fa-solid fa-hashtag"></i></span>
+                            <input type="text" class="form-control form-control-custom text-center font-outfit" name="complaint_id" placeholder="CMP-123456" value="{{ query_id or '' }}" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary-gradient px-4"><i class="fa-solid fa-magnifying-glass me-2"></i>Search</button>
+                </form>
+            </div>
+            
+            {% if complaint %}
+                <!-- Complaint Details Panel -->
+                <div class="card card-glass p-5">
+                    <div class="d-flex flex-sm-row flex-column justify-content-between align-items-sm-center border-bottom border-glass pb-4 mb-4 gap-3">
+                        <div>
+                            <span class="text-muted-light small font-outfit uppercase tracking-wider">TRACKING ID</span>
+                            <h3 class="text-white font-outfit mb-0">{{ complaint.complaint_id }}</h3>
+                        </div>
+                        <div>
+                            {% if complaint.status == 'Submitted' %}
+                                <span class="badge-status badge-submitted"><i class="fa-solid fa-paper-plane me-1"></i> Submitted</span>
+                            {% elif complaint.status == 'Under Review' %}
+                                <span class="badge-status badge-review"><i class="fa-solid fa-magnifying-glass me-1"></i> Under Review</span>
+                            {% elif complaint.status == 'In Progress' %}
+                                <span class="badge-status badge-progress"><i class="fa-solid fa-spinner fa-spin me-1"></i> In Progress</span>
+                            {% elif complaint.status == 'Resolved' %}
+                                <span class="badge-status badge-resolved"><i class="fa-solid fa-circle-check me-1"></i> Resolved</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Tracking Step-by-Step UI -->
+                    <div class="timeline-track">
+                        <!-- Width depends on the current status -->
+                        {% set bar_width = '0%' %}
+                        {% if complaint.status == 'Under Review' %}
+                            {% set bar_width = '33.33%' %}
+                        {% elif complaint.status == 'In Progress' %}
+                            {% set bar_width = '66.66%' %}
+                        {% elif complaint.status == 'Resolved' %}
+                            {% set bar_width = '100%' %}
+                        {% endif %}
+                        
+                        <div class="timeline-progress-bar" style="width: {{ bar_width }}"></div>
+                        
+                        <!-- Step 1 -->
+                        <div class="timeline-step {% if complaint.status in ['Submitted', 'Under Review', 'In Progress', 'Resolved'] %}completed{% endif %}">
+                            <div class="step-icon">
+                                <i class="fa-solid fa-file-arrow-up"></i>
+                            </div>
+                            <div class="step-label">Submitted</div>
+                        </div>
+                        
+                        <!-- Step 2 -->
+                        <div class="timeline-step {% if complaint.status in ['Under Review', 'In Progress', 'Resolved'] %}completed{% elif complaint.status == 'Submitted' %}active{% endif %}">
+                            <div class="step-icon">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </div>
+                            <div class="step-label">Under Review</div>
+                        </div>
+                        
+                        <!-- Step 3 -->
+                        <div class="timeline-step {% if complaint.status in ['In Progress', 'Resolved'] %}completed{% elif complaint.status == 'Under Review' %}active{% endif %}">
+                            <div class="step-icon">
+                                <i class="fa-solid fa-spinner"></i>
+                            </div>
+                            <div class="step-label">In Progress</div>
+                        </div>
+                        
+                        <!-- Step 4 -->
+                        <div class="timeline-step {% if complaint.status == 'Resolved' %}completed{% elif complaint.status == 'In Progress' %}active{% endif %}">
+                            <div class="step-icon">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                            <div class="step-label">Resolved</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Details Table -->
+                    <div class="row g-4 mt-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted-light small">Category</h6>
+                            <p class="text-white">{{ complaint.category }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted-light small">Submitted Date</h6>
+                            <p class="text-white">{{ complaint.created_at.strftime('%d %B %Y, %I:%M %p') }}</p>
+                        </div>
+                        
+                        <div class="col-12">
+                            <h6 class="text-muted-light small">Complaint Title</h6>
+                            <p class="text-white font-weight-600">{{ complaint.title }}</p>
+                        </div>
+                        
+                        <div class="col-12">
+                            <h6 class="text-muted-light small">Description</h6>
+                            <div class="p-3 rounded bg-white-5 border border-glass">
+                                <p class="text-white-50 small mb-0" style="white-space: pre-wrap;">{{ complaint.description }}</p>
+                            </div>
+                        </div>
+                        
+                        {% if complaint.supporting_doc %}
+                            <div class="col-12">
+                                <h6 class="text-muted-light small">Supporting Document / Evidence</h6>
+                                <a href="{{ url_for('static', filename='uploads/' + complaint.supporting_doc) }}" target="_blank" class="btn btn-secondary-custom btn-sm">
+                                    <i class="fa-solid fa-file-arrow-down me-2"></i>View Uploaded Evidence
+                                </a>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="col-12">
+                            <h6 class="text-muted-light small">Reporting Profile</h6>
+                            <p class="text-white">
+                                {% if complaint.is_anonymous %}
+                                    <span class="text-accent-color"><i class="fa-solid fa-user-secret me-1"></i> Anonymous Submission</span>
+                                {% else %}
+                                    <span><i class="fa-solid fa-user-shield me-1"></i> Logged Student Profile</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Admin Notes Section -->
+                    <div class="mt-5 p-4 rounded border border-secondary bg-white-5">
+                        <h5 class="text-white font-outfit mb-3"><i class="fa-regular fa-comment-dots text-accent-color me-2"></i>Administrator Feedback</h5>
+                        {% if complaint.admin_notes %}
+                            <p class="text-white-50 small mb-0" style="white-space: pre-wrap;">{{ complaint.admin_notes }}</p>
+                        {% else %}
+                            <p class="text-muted-light small mb-0">No official notes or updates have been added by administrators yet. Please check back later.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

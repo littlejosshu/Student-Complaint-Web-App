@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}ReportSafe - Student & Youth Safe Complaint Portal{% endblock %}
+
+{% block content %}
+<div class="container">
+    
+    <!-- Hero Section -->
+    <section class="hero-section row align-items-center g-5">
+        <div class="col-lg-6">
+            <h1 class="hero-title">Helping Students Report Issues Safely & Easily</h1>
+            <p class="hero-subtitle">
+                A secure digital space designed for youth aged 13–25 to register school, college, safety, or civic issues. Speak up without fear through encrypted and anonymous reporting.
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+                <a href="{{ url_for('submit_complaint') }}" class="btn btn-primary-gradient btn-lg px-4"><i class="fa-solid fa-file-signature me-2"></i>Submit a Complaint</a>
+                <a href="{{ url_for('track') }}" class="btn btn-secondary-custom btn-lg px-4"><i class="fa-solid fa-magnifying-glass me-2"></i>Track Status</a>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="hero-image-container">
+                <img src="{{ url_for('static', filename='images/hero_illustration.png') }}" class="img-fluid w-100" alt="Students Reporting Safely Web Illustration" style="min-height: 350px; object-fit: cover;">
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Widgets Panel -->
+    <section class="row g-4 my-5">
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-widget card-glass">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-title">Total Reports</div>
+                        <div class="stat-value text-white">{{ stats.total }}</div>
+                    </div>
+                    <i class="fa-solid fa-folder-open text-primary-color fs-2"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-widget card-glass">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-title">In Progress</div>
+                        <div class="stat-value text-warning">{{ stats.in_progress }}</div>
+                    </div>
+                    <i class="fa-solid fa-spinner text-warning fs-2"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-widget card-glass">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-title">Resolved Case</div>
+                        <div class="stat-value text-success">{{ stats.resolved }}</div>
+                    </div>
+                    <i class="fa-solid fa-circle-check text-success fs-2"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="stat-widget card-glass">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="stat-title">Anonymous Submissions</div>
+                        <div class="stat-value text-accent-color">{{ stats.anonymous }}</div>
+                    </div>
+                    <i class="fa-solid fa-user-secret text-accent-color fs-2"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Complaint Categories Overview -->
+    <section class="my-5">
+        <div class="text-center mb-5">
+            <h2 class="font-outfit text-white">What Issues Can You Report?</h2>
+            <p class="text-muted-light">Choose from our main reporting categories to submit your concern directly to administrators.</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="card card-glass h-100 p-4 category-card" onclick="location.href='{{ url_for('submit_complaint', category='Harassment') }}'">
+                    <div class="icon-box">
+                        <i class="fa-solid fa-hand-holding-hand"></i>
+                    </div>
+                    <h4 class="font-outfit text-white">Harassment</h4>
+                    <p class="text-muted-light small mb-0">Report any form of harassment (online or offline), physical intimidation, or threat from anyone in or out of your institution.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="card card-glass h-100 p-4 category-card" onclick="location.href='{{ url_for('submit_complaint', category='Bullying/Cyberbullying') }}'">
+                    <div class="icon-box">
+                        <i class="fa-solid fa-mask"></i>
+                    </div>
+                    <h4 class="font-outfit text-white">Bullying / Cyberbullying</h4>
+                    <p class="text-muted-light small mb-0">Speak up against school yard intimidation or toxic digital behavior, online abuse, social media defamation, or hacking.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="card card-glass h-100 p-4 category-card" onclick="location.href='{{ url_for('submit_complaint', category='Safety Issues') }}'">
+                    <div class="icon-box">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <h4 class="font-outfit text-white">Safety Issues</h4>
+                    <p class="text-muted-light small mb-0">Flag physical threats on campus, unsafe commutes, stalking, or immediate hazard issues requiring immediate attention.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mt-md-4">
+                <div class="card card-glass h-100 p-4 category-card" onclick="location.href='{{ url_for('submit_complaint', category='College/School Related') }}'">
+                    <div class="icon-box">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <h4 class="font-outfit text-white">College/School Related</h4>
+                    <p class="text-muted-light small mb-0">Address academic misconduct, unfair treatment by faculty or staff, administrative hurdles, or classroom facilities.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mt-md-4">
+                <div class="card card-glass h-100 p-4 category-card" onclick="location.href='{{ url_for('submit_complaint', category='Civic Issues') }}'">
+                    <div class="icon-box">
+                        <i class="fa-solid fa-road"></i>
+                    </div>
+                    <h4 class="font-outfit text-white">Civic Issues</h4>
+                    <p class="text-muted-light small mb-0">Report public problems impacting your commute to school or college (unpaved roads, broken streetlights, trash pile-ups).</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Why Choose Us / Safety Section -->
+    <section class="row align-items-center g-5 my-5 py-4">
+        <div class="col-lg-6 order-lg-2">
+            <h2 class="font-outfit text-white mb-4">Why ReportSafe?</h2>
+            <div class="d-flex mb-4">
+                <div class="me-3">
+                    <span class="d-inline-flex align-items-center justify-content-center bg-primary-color rounded-circle text-white" style="width: 50px; height: 50px;">
+                        <i class="fa-solid fa-user-secret fs-5"></i>
+                    </span>
+                </div>
+                <div>
+                    <h5 class="text-white font-outfit">Fully Anonymous Option</h5>
+                    <p class="text-muted-light small">You don't need to log in or share any identifying details. We generate a tracking code so you can check progress without revealing your identity.</p>
+                </div>
+            </div>
+            <div class="d-flex mb-4">
+                <div class="me-3">
+                    <span class="d-inline-flex align-items-center justify-content-center bg-secondary-color rounded-circle text-white" style="width: 50px; height: 50px;">
+                        <i class="fa-solid fa-lock fs-5"></i>
+                    </span>
+                </div>
+                <div>
+                    <h5 class="text-white font-outfit">Data Protection & Privacy</h5>
+                    <p class="text-muted-light small">All registered student database fields are encrypted. Administrators process issues standardly without exposing student emails or numbers.</p>
+                </div>
+            </div>
+            <div class="d-flex">
+                <div class="me-3">
+                    <span class="d-inline-flex align-items-center justify-content-center bg-accent-color rounded-circle text-black" style="width: 50px; height: 50px;">
+                        <i class="fa-solid fa-chart-line fs-5"></i>
+                    </span>
+                </div>
+                <div>
+                    <h5 class="text-white font-outfit">Transparent Tracking</h5>
+                    <p class="text-muted-light small">Follow your complaint progress as it moves from Submitted, to Under Review, to In Progress, and finally Resolved.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 order-lg-1">
+            <div class="hero-image-container">
+                <img src="{{ url_for('static', filename='images/privacy_illustration.png') }}" class="img-fluid w-100" alt="Confidential Data Security Illustration" style="min-height: 350px; object-fit: cover;">
+            </div>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

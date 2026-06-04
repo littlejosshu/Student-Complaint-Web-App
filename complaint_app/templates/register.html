@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Register for ReportSafe | Safe Student Portal{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            
+            <div class="card card-glass p-5">
+                <div class="text-center mb-4">
+                    <h2 class="font-outfit text-white">Create a Student Profile</h2>
+                    <p class="text-muted-light small">Register to track multiple complaints, edit your profile, and receive notifications.</p>
+                </div>
+                
+                <form action="{{ url_for('register') }}" method="POST" class="needs-validation-custom" novalidate>
+                    
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label text-white small">Full Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white-5 border-glass text-muted-light"><i class="fa-regular fa-user"></i></span>
+                            <input type="text" class="form-control form-control-custom" id="full_name" name="full_name" placeholder="John Doe" required>
+                        </div>
+                        <div class="invalid-feedback">Please enter your full name.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="email" class="form-label text-white small">Email Address</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white-5 border-glass text-muted-light"><i class="fa-regular fa-envelope"></i></span>
+                            <input type="email" class="form-control form-control-custom" id="email" name="email" placeholder="john@example.com" required>
+                        </div>
+                        <div class="invalid-feedback">Please enter a valid email address.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="mobile" class="form-label text-white small">Mobile Number</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white-5 border-glass text-muted-light"><i class="fa-solid fa-phone"></i></span>
+                            <input type="tel" class="form-control form-control-custom" id="mobile" name="mobile" placeholder="9876543210" pattern="[0-9]{10}" required>
+                        </div>
+                        <div class="invalid-feedback">Please enter a valid 10-digit mobile number.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="school_college" class="form-label text-white small">School / College Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white-5 border-glass text-muted-light"><i class="fa-solid fa-graduation-cap"></i></span>
+                            <input type="text" class="form-control form-control-custom" id="school_college" name="school_college" placeholder="National Institute of Technology" required>
+                        </div>
+                        <div class="invalid-feedback">Please enter your school or college name.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="register-password" class="form-label text-white small">Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white-5 border-glass text-muted-light"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" class="form-control form-control-custom password-match" id="register-password" name="password" placeholder="Min 8 characters" minlength="8" required>
+                        </div>
+                        <div class="password-meter">
+                            <div id="strength-bar" class="password-meter-bar"></div>
+                        </div>
+                        <div class="invalid-feedback">Password must be at least 8 characters.</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="confirm_password" class="form-label text-white small">Confirm Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white-5 border-glass text-muted-light"><i class="fa-solid fa-circle-check"></i></span>
+                            <input type="password" class="form-control form-control-custom password-confirm" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
+                        </div>
+                        <div class="invalid-feedback">Passwords do not match.</div>
+                    </div>
+                    
+                    <div class="mb-4 form-check text-start">
+                        <input type="checkbox" class="form-check-input bg-transparent border-glass" id="terms" required>
+                        <label class="form-check-label text-muted-light small" for="terms">I agree to the <a href="{{ url_for('about') }}" class="text-accent-color text-decoration-none">Privacy Protection Policy</a>.</label>
+                        <div class="invalid-feedback">You must agree before submitting.</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary-gradient w-100 py-3 mb-3"><i class="fa-solid fa-user-plus me-2"></i>Register Now</button>
+                    
+                    <p class="text-center text-muted-light small mb-0">Already have an account? <a href="{{ url_for('login') }}" class="text-accent-color text-decoration-none font-weight-600">Login here</a></p>
+                </form>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

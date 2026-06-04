@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Register a Complaint | ReportSafe{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            
+            <div class="text-center mb-5">
+                <h1 class="font-outfit text-white">Register a New Complaint</h1>
+                <p class="text-muted-light">Speak up safely. Select a category below to detail your concern. We secure your identity.</p>
+            </div>
+            
+            <!-- Category Selection Cards (Dynamic Select) -->
+            <div class="row g-4 justify-content-center mb-5">
+                {% set active_cat = request.args.get('category', '') %}
+                
+                <div class="col-lg-4 col-md-6 col-sm-6">
+                    <div class="card card-glass p-3 h-100 category-card text-center {% if active_cat == 'Harassment' %}border-info shadow-accent-glow{% endif %}" data-category="Harassment">
+                        <div class="icon-box mx-auto">
+                            <i class="fa-solid fa-hand-holding-hand"></i>
+                        </div>
+                        <h5 class="text-white font-outfit">Harassment</h5>
+                        <p class="small text-muted-light mb-0">Online/offline threats or abuse.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6 col-sm-6">
+                    <div class="card card-glass p-3 h-100 category-card text-center {% if active_cat == 'Bullying/Cyberbullying' %}border-info shadow-accent-glow{% endif %}" data-category="Bullying/Cyberbullying">
+                        <div class="icon-box mx-auto">
+                            <i class="fa-solid fa-mask"></i>
+                        </div>
+                        <h5 class="text-white font-outfit">Bullying / Cyberbullying</h5>
+                        <p class="small text-muted-light mb-0">Hate speech or cyber harassment.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6 col-sm-6">
+                    <div class="card card-glass p-3 h-100 category-card text-center {% if active_cat == 'Safety Issues' %}border-info shadow-accent-glow{% endif %}" data-category="Safety Issues">
+                        <div class="icon-box mx-auto">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <h5 class="text-white font-outfit">Safety Issues</h5>
+                        <p class="small text-muted-light mb-0">Unsafe environments or stalking.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6 col-sm-6 mt-lg-4">
+                    <div class="card card-glass p-3 h-100 category-card text-center {% if active_cat == 'College/School Related' %}border-info shadow-accent-glow{% endif %}" data-category="College/School Related">
+                        <div class="icon-box mx-auto">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <h5 class="text-white font-outfit">School/College Related</h5>
+                        <p class="small text-muted-light mb-0">Academic, classroom or staff issues.</p>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 col-md-6 col-sm-6 mt-lg-4">
+                    <div class="card card-glass p-3 h-100 category-card text-center {% if active_cat == 'Civic Issues' %}border-info shadow-accent-glow{% endif %}" data-category="Civic Issues">
+                        <div class="icon-box mx-auto">
+                            <i class="fa-solid fa-road"></i>
+                        </div>
+                        <h5 class="text-white font-outfit">Civic Issues</h5>
+                        <p class="small text-muted-light mb-0">Broken infrastructure, lighting, cleanup.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hidden anchor for scroll helper -->
+            <div id="complaint-form-details"></div>
+            
+            <!-- Main Details Card -->
+            <div class="card card-glass p-5">
+                <form action="{{ url_for('submit_complaint') }}" method="POST" enctype="multipart/form-data" class="needs-validation-custom" novalidate>
+                    
+                    <h3 class="font-outfit text-white mb-4"><i class="fa-solid fa-pen-nib text-accent-color me-2"></i>Complaint Details</h3>
+                    
+                    <div class="mb-4">
+                        <label for="category-dropdown" class="form-label text-white small">Complaint Category</label>
+                        <select class="form-select form-control-custom form-select-custom" id="category-dropdown" name="category" required>
+                            <option value="" disabled {% if not active_cat %}selected{% endif %}>Select a category...</option>
+                            <option value="Harassment" {% if active_cat == 'Harassment' %}selected{% endif %}>Harassment (Online/Offline)</option>
+                            <option value="Bullying/Cyberbullying" {% if active_cat == 'Bullying/Cyberbullying' %}selected{% endif %}>Bullying/Cyberbullying</option>
+                            <option value="Safety Issues" {% if active_cat == 'Safety Issues' %}selected{% endif %}>Safety Issues</option>
+                            <option value="College/School Related" {% if active_cat == 'College/School Related' %}selected{% endif %}>College/School Related Issues</option>
+                            <option value="Civic Issues" {% if active_cat == 'Civic Issues' %}selected{% endif %}>Civic Issues (Roads, Streetlights, Cleanup)</option>
+                        </select>
+                        <div class="invalid-feedback">Please select a complaint category.</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="title" class="form-label text-white small">Complaint Title</label>
+                        <input type="text" class="form-control form-control-custom" id="title" name="title" placeholder="Brief summary of the issue (e.g. Broken streetlight on West Street)" required>
+                        <div class="invalid-feedback">Please enter a complaint title.</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="description" class="form-label text-white small">Detailed Description</label>
+                        <textarea class="form-control form-control-custom" id="description" name="description" rows="6" placeholder="Provide as much context as possible. Include dates, locations, and names if necessary. Be precise." required></textarea>
+                        <div class="invalid-feedback">Please describe your complaint in detail.</div>
+                    </div>
+                    
+                    <!-- Drag-and-drop file upload -->
+                    <div class="mb-4">
+                        <label class="form-label text-white small">Upload Supporting Documents / Images (Optional)</label>
+                        <div id="drag-drop-zone" class="file-upload-wrapper">
+                            <i class="fa-solid fa-cloud-arrow-up file-upload-icon"></i>
+                            <h6 class="text-white font-outfit mb-1">Drag & Drop files here, or click to browse</h6>
+                            <p id="file-upload-info" class="text-muted-light small mb-0">PNG, JPG, JPEG, GIF, PDF, DOC, DOCX, TXT (Max 16MB)</p>
+                            <input type="file" id="file-upload-input" name="file" class="file-upload-input">
+                        </div>
+                    </div>
+                    
+                    <!-- Anonymous Toggle Options -->
+                    <div class="p-4 mb-4 rounded bg-white-5 border border-glass">
+                        <div class="d-flex align-items-start">
+                            {% if session.get('user_id') %}
+                                <div class="form-check form-switch fs-5">
+                                    <input class="form-check-input bg-transparent border-glass" type="checkbox" role="switch" id="anonymous-toggle" name="anonymous" value="true">
+                                </div>
+                                <div class="ms-2">
+                                    <label class="form-label text-white font-outfit mb-0 d-block" for="anonymous-toggle">Submit Anonymously</label>
+                                    <span class="text-muted-light small">Hides your student profile from administrators. A tracking code is generated so you can view responses, but no personal details are saved with the complaint.</span>
+                                </div>
+                            {% else %}
+                                <input type="hidden" name="anonymous" value="true">
+                                <div class="me-3">
+                                    <i class="fa-solid fa-user-secret text-accent-color fs-3"></i>
+                                </div>
+                                <div>
+                                    <h6 class="text-white font-outfit mb-0">Anonymous Submission Enforced</h6>
+                                    <p class="text-muted-light small mb-0 mt-1">You are not logged in. Your complaint will be submitted anonymously. We will generate a unique tracking code so you can check updates. To connect this to a profile, please <a href="{{ url_for('login') }}" class="text-accent-color text-decoration-none">log in first</a>.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary-gradient w-100 py-3"><i class="fa-solid fa-circle-check me-2"></i>Register Complaint</button>
+                    
+                </form>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
